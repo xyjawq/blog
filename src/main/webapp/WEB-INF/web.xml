@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <!--设置session超时时间，默认是30分钟，这里设置120分钟,如果是0或负数，永远不会超时-->
+    <session-config>
+        <session-timeout>120</session-timeout>
+    </session-config>
+
+    <!--加载顺序是<listener> -> <filter> -> <servlet>，
+    下面这个监听实现的是web应用启动和关闭的监听，在web应用启动或关闭时做些操作
+    （下面这个实现就是在web应用启动的时候自动装配applicationContext.xml配置），
+    也可以用ContextLoaderServlet 来实现，但是需要注意上面的加载顺序，
+    servlet是在filter之后加载的，看需要。-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!--过滤器配置 filter是对servlet的增强，对request和response进行拦截进行处理
+    如果又多个filter就是一个处理链（下面就是对字符集进行编码转换处理的）,处理完成之后
+    再交给servlet，就跟上面说的流程是一样的，这时候dispatcherServlet拿到的request
+    就是filter处理之后的，然后返回的response会交给filter再进行加工
+    可用的filter又很多，比如针对某些请求禁用浏览器缓存等-->
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <!--这里表示所有的请求都将使用此filter进行处理-->
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!--同一个web容器不同的web项目需要使用不容得webAppRootKey来进行标识-->
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>blog-root</param-value>
+    </context-param>
+
+    <!--web应用的context配置文件,是在servlet之前加载的，所有的servlet都可以使用-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring/application-context.xml</param-value>
+    </context-param>
+
+    <servlet>
+        <servlet-name>dispatcherServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+
+        <!--即便这里不进行配置，还是一样会使用到context-param中的配置-->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+
+            <param-value>classpath:spring/dispatcher-servlet.xml</param-value>
+        </init-param>
+        <!--表示应用启动的时候就创建此servlet实例，中间设置的值表示载入的顺序，越小越先载入-->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <!--对所有请求都使用这个servlet进行分发-->
+        <servlet-name>dispatcherServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+</web-app>
