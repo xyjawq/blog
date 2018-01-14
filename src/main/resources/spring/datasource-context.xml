@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+        <bean id="readDataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+            <property name="driverClassName"><value>${jdbc.driverclass}</value></property>
+            <property name="url"><value>${jdbc.url}</value></property>
+            <property name="username"><value>${jdbc.username}</value></property>
+            <property name="password"><value>${jdbc.password}</value></property>
+            <property name="initialSize" value="3" />
+            <!-- 最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时来不及申请  默认值是0 -->
+            <property name="minIdle" value="1" />
+            <!-- 最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部分，一直减少到maxIdle为止 ，0时无限制  默认值是8 -->
+            <property name="maxIdle" value="4" />
+            <!-- 连接池的最大值，同一时间可以从池分配的最多连接数量，0时无限制   默认值是8 -->
+            <property name="maxTotal" value="4" />
+        </bean>
+        <bean id="writeDataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+            <property name="driverClassName"><value>${jdbc.driverclass}</value></property>
+            <!--<value>这中间绝对不能有空格，解析property的时候标签中间的多有东西都会被当成占位符，最后替换后的值后面会会多一个空格，如下面就是错误的</value>-->
+            <!--${jdbc.url}后面的空格会导致url的值后面多一个空格，从而导致错误！！！-->
+            <!--<property name="url"><value>${jdbc.url} </value></property>-->
+            <property name="url"><value>${jdbc.url}</value></property>
+            <property name="username"><value>${jdbc.username}</value></property>
+            <property name="password"><value>${jdbc.password}</value></property>
+            <property name="initialSize" value="3" />
+            <!-- 最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时来不及申请  默认值是0 -->
+            <property name="minIdle" value="1" />
+            <!-- 最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部分，一直减少到maxIdle为止 ，0时无限制  默认值是8 -->
+            <property name="maxIdle" value="4" />
+            <!-- 连接池的最大值，同一时间可以从池分配的最多连接数量，0时无限制   默认值是8 -->
+            <property name="maxTotal" value="4" />
+        </bean>
+
+        <bean id="dataSource" class="jin.blog.datasource.DataSourceSelector">
+            <property name="targetDataSources">
+                <map key-type="jin.blog.datasource.DataSourceType">
+                    <entry key="READ" value-ref="readDataSource"/>
+                    <entry key="WRITE" value-ref="writeDataSource"/>
+                </map>
+            </property>
+            <property name="defaultTargetDataSource" ref="readDataSource"/>
+        </bean>
+
+        <!-- 在使用mybatis时 spring使用sqlsessionFactoryBean 来管理mybatis的sqlsessionFactory -->
+        <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+            <property name="basePackage" value="jin.blog.dao" />
+        </bean>
+
+        <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+            <property name="dataSource" ref="dataSource" />
+            <!-- 实体类映射文件路径 -->
+            <property name="mapperLocations" value="classpath:/mapper/**/*.xml" />
+        </bean>
+
+        <bean id="MapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+            <!-- 这里的basePackage 指定了dao层接口路径，这里的dao接口不用自己实现 -->
+            <property name="basePackage" value="jin.blog.dao" />
+            <!-- 如果只有一个数据源的话可以不用指定，但是如果有多个数据源的话必须要指定 -->
+            <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+        </bean>
+
+        <!--事务管理器 -->
+        <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <property name="dataSource" ref="dataSource" />
+        </bean>
+        <!-- 使用全注释事务 -->
+        <tx:annotation-driven transaction-manager="transactionManager" />
+</beans>

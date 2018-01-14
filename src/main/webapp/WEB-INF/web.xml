@@ -52,7 +52,8 @@
     <!--web应用的context配置文件,是在servlet之前加载的，所有的servlet都可以使用-->
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:spring/application-context.xml</param-value>
+        <!--由于所有的xml文件都会拷贝到target下面去，所以下面的路径可用-->
+        <param-value>classpath:spring/*-context.xml</param-value>
     </context-param>
 
     <servlet>
