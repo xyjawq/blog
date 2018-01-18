@@ -9,6 +9,7 @@
 
     <properties>
         <org.springframework.version>5.0.0.RELEASE</org.springframework.version>
+        <fasterxml.jackson.version>2.9.3</fasterxml.jackson.version>
         <resources.base>${project.basedir}/src/main/resources</resources.base>
     </properties>
 
@@ -113,6 +114,25 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.45</version>
         </dependency>
+
+        <!--json convert-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${fasterxml.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${fasterxml.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${fasterxml.jackson.version}</version>
+        </dependency>
+
+
 
         <!--test-->
         <dependency>

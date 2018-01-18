@@ -1,3 +1,4 @@
+jin\blog\common\ListRes.class
 jin\blog\controller\UserController.class
 jin\blog\datasource\DataSourceSelector.class
 jin\blog\dao\UserDao.class
