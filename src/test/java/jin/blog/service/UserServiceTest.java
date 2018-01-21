@@ -5,7 +5,9 @@ import jin.blog.domain.User;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Author: xuyongjin
@@ -18,7 +20,8 @@ public class UserServiceTest extends BaseTest{
 
     @Test
     public void testUserService(){
-        List<User> users = userService.getUsers();
+        Map params = new HashMap();
+        List<User> users = userService.getUsers(params);
 //        System.out.println(users);
         System.out.println("test");
     }
